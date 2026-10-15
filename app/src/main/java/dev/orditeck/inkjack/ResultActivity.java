@@ -22,7 +22,7 @@ public final class ResultActivity extends Activity {
         body.addView(editor,new LinearLayout.LayoutParams(-1,-2));
         body.addView(Ui.button(this,"Copy text",true,v->{String text=chosen();if(text.isBlank()){Ui.toast(this,"Select or enter some text first.");return;}getSystemService(ClipboardManager.class).setPrimaryClip(ClipData.newPlainText("Inkjack",text));Ui.toast(this,"Copied");}));
         body.addView(Ui.button(this,"Share text",false,v->{String text=chosen();if(text.isBlank())return;startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,text),"Share text"));}));
-        body.addView(Ui.button(this,"Add to stash",false,v->{try{boolean added=Session.collection.add(chosen());Ui.toast(this,added ? "Added to stash" : "Already in stash, or empty");}catch(IllegalStateException e){Ui.toast(this,e.getMessage());}}));
+        body.addView(Ui.button(this,"Add to collection",false,v->{try{boolean added=Session.collection.add(chosen());Ui.toast(this,added ? "Added to collection" : "Already collected, or empty");}catch(IllegalStateException e){Ui.toast(this,e.getMessage());}}));
         body.addView(Ui.button(this,"Extract links, emails, and more",false,v->entities()));
         body.addView(Ui.button(this,"Done",false,v->finish()));
     }

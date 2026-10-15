@@ -3,6 +3,5 @@
     <string name="tile_label">Lift text</string>
     <string name="reading_progress">Reading on your device… You can return here when it is ready.</string>
     <string name="empty_ocr">No text found. Try a clearer image or another OCR language.</string>
-    <string name="selection_count">Selected: %1$d / %2$d · long-press to edit a box</string>
     <string name="accessibility_description">Inkjack reads visible screen text or takes a screenshot only when you tap Lift text. You choose what to copy or share. Recognized text stays in memory, screenshots are discarded, and no data is sent over the internet. Password fields are excluded from screen text capture. Disable this service at any time in Accessibility settings.</string>
 </resources>

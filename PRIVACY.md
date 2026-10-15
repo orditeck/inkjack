@@ -8,7 +8,7 @@ When you explicitly activate a capture, Inkjack reads visible text exposed throu
 
 Images and PDFs are accessed through user-granted content URIs. Inkjack processes their content locally and does not save copies. Screenshots and temporary image buffers stay in memory and are released after use. OCR data files are copied from the APK to app-private storage for the OCR engine.
 
-Recognized text, editor content, and the multi-screen stash remain in process memory. Android can terminate that process, which discards the stash. An editor draft may temporarily be held in Android's activity saved state to survive a configuration change. There is no permanent capture history. Language and notification-shortcut preferences are stored in app-private settings. App backups are disabled.
+Recognized text, editor content, and the multi-screen collection remain in process memory. Android can terminate that process, which discards the collection. An editor draft may temporarily be held in Android's activity saved state to survive a configuration change. There is no permanent capture history. Language, notification-shortcut, and capture-toolbar presentation preferences are stored in app-private settings. App backups are disabled.
 
 When you tap Copy, selected text is placed on Android's system clipboard, which is governed by Android's clipboard controls. When you tap Share, text is passed to the recipient app you select, which has its own privacy practices. Your keyboard may process text entered in the editor according to its own settings.
 

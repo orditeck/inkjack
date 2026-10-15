@@ -1,1 +1,9 @@
-<resources><item name="editor" type="id"/></resources>
+<resources>
+    <item name="editor" type="id"/>
+    <item name="overlay_copy" type="id"/><item name="overlay_edit" type="id"/>
+    <item name="overlay_select_all" type="id"/><item name="overlay_scan" type="id"/>
+    <item name="overlay_collect" type="id"/><item name="overlay_settings_preview" type="id"/>
+    <item name="overlay_toggle_preview" type="id"/><item name="overlay_toggle_ocr" type="id"/>
+    <item name="overlay_toggle_collect" type="id"/><item name="overlay_toggle_close" type="id"/>
+    <item name="overlay_toggle_outlines" type="id"/>
+</resources>

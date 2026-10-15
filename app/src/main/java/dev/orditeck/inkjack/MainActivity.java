@@ -53,14 +53,15 @@ public final class MainActivity extends Activity {
         body.addView(Ui.button(this,"Scan an image or PDF",true,v->pickDocument()));
         progress=Ui.text(this,"English + French OCR · fully offline",13,Ui.MUTED); body.addView(progress);
         if(Session.importRunning)progress.setText(R.string.reading_progress);
-        var collection=Ui.card(this,body); collection.addView(Ui.label(this,"THE STASH"));
+        body.addView(Ui.button(this,"Customize capture toolbar",false,v->startActivity(new Intent(this,OverlaySettingsActivity.class))));
+        var collection=Ui.card(this,body); collection.addView(Ui.label(this,"COLLECTED TEXT"));
         collection.addView(Ui.text(this,Session.collection.size()+" saved selection"+(Session.collection.size()==1 ? "" : "s"),21,Ui.WHITE));
-        collection.addView(Ui.text(this,"Collect text across screens. Your stash lives in memory and disappears when the app process closes.",14,Ui.MUTED));
-        collection.addView(Ui.button(this,"Open stash",false,v->{Session.result=Session.collection.text(); startActivity(new Intent(this,ResultActivity.class));}));
-        collection.addView(Ui.button(this,"Clear stash",false,v->new AlertDialog.Builder(this).setTitle("Clear your stash?").setMessage("This removes all collected text from Inkjack's memory.").setNegativeButton("Keep it",null).setPositiveButton("Clear",(d,w)->{Session.collection.clear();showHome();}).show()));
+        collection.addView(Ui.text(this,"Combine selections from several screens. Collected text stays in memory until you clear it or the app process closes.",14,Ui.MUTED));
+        collection.addView(Ui.button(this,"Open collection",false,v->{Session.result=Session.collection.text(); startActivity(new Intent(this,ResultActivity.class));}));
+        collection.addView(Ui.button(this,"Clear collection",false,v->new AlertDialog.Builder(this).setTitle("Clear collected text?").setMessage("This removes all collected text from Inkjack's memory.").setNegativeButton("Keep it",null).setPositiveButton("Clear",(d,w)->{Session.collection.clear();showHome();}).show()));
         body.addView(Ui.button(this,"OCR language",false,v->chooseLanguage()));
         Ui.gap(body,16); body.addView(Ui.label(this,"NO ADS. NO ACCOUNTS. NO CLOUD."));
-        body.addView(Ui.text(this,"Inkjack 0.1.0 · Open source · Apache 2.0\nOnly captures when you ask. No internet permission.",12,Ui.MUTED));
+        body.addView(Ui.text(this,"Inkjack "+BuildConfig.VERSION_NAME+" · Open source · Apache 2.0\nOnly captures when you ask. No internet permission.",12,Ui.MUTED));
         body.addView(Ui.button(this,"Open-source licenses",false,v->startActivity(new Intent(this,LicensesActivity.class))));
     }
     private void disclosure() {

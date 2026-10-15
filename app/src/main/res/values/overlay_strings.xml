@@ -1,0 +1,31 @@
+<resources>
+    <string name="overlay_title">Select text</string>
+    <string name="overlay_more">More actions</string>
+    <string name="overlay_close">Close capture</string>
+    <string name="overlay_copy">Copy text</string>
+    <string name="overlay_edit">Edit text</string>
+    <string name="overlay_edit_all">Edit all text</string>
+    <string name="overlay_select_all">Select all</string>
+    <string name="overlay_clear">Clear selection</string>
+    <string name="overlay_scan">Scan screen</string>
+    <string name="overlay_collect">Collect text</string>
+    <string name="overlay_select_help">Select every detected text block</string>
+    <string name="overlay_scan_help">Scan this screen with OCR to read text inside images</string>
+    <string name="overlay_collect_help">Add selected text to your collection across screens</string>
+    <string name="overlay_count_screen">Screen text · Selected: %1$d / %2$d</string>
+    <string name="overlay_count_ocr">Offline OCR · Selected: %1$d / %2$d</string>
+    <string name="overlay_empty">No text found. Try Scan screen for text inside images.</string>
+    <string name="overlay_hint">Tap outlined text, or use Select all.</string>
+    <string name="overlay_view_description">Tap text blocks to select them. Edit all text opens the detected text in an accessible editor.</string>
+    <string name="overlay_added">Added to collection. Capture another screen to keep collecting.</string>
+    <string name="overlay_not_added">Select some new text to add to your collection.</string>
+    <string name="overlay_customize">Customize toolbar</string>
+    <string name="overlay_move_top">Move toolbar to top</string>
+    <string name="overlay_move_bottom">Move toolbar to bottom</string>
+    <string name="overlay_preview_notice">This is a preview. Capture a screen to use this action.</string>
+    <string name="overlay_preview_sample">A few words worth keeping.\nDes mots à garder.</string>
+    <string name="overlay_preview_position">Appears at the %1$s of your screen</string>
+    <string name="overlay_dim_value">Background dimming: %1$d%%</string>
+    <string name="overlay_hide_preview">Hide preview</string>
+    <string name="overlay_show_preview">Show preview</string>
+</resources>
