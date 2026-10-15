@@ -1,0 +1,9 @@
+Inkjack
+Copyright 2026 Inkjack contributors
+
+Original implementation. Not affiliated with Universal Copy or Camel Corporation.
+
+This product uses Tesseract4Android (Adaptech s.r.o., Robert Pösel),
+Tesseract OCR, Leptonica, libjpeg, libpng, and tessdata_fast OCR models.
+Their respective copyright notices and license terms continue to apply.
+See THIRD_PARTY.md and the dependency distributions for details.

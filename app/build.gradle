@@ -1,0 +1,37 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'dev.orditeck.inkjack'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'dev.orditeck.inkjack'
+        minSdk 30
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0'
+        testInstrumentationRunner 'android.test.InstrumentationTestRunner'
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes { release { minifyEnabled false } }
+    sourceSets.main.assets.srcDir layout.buildDirectory.dir('generated/ocrAssets')
+    testOptions { unitTests.includeAndroidResources = true }
+    lint { abortOnError true }
+}
+
+tasks.register('prepareOcrModels', Exec) {
+    inputs.file rootProject.file('scripts/fetch_models.py')
+    outputs.dir layout.buildDirectory.dir('generated/ocrAssets/tessdata')
+    commandLine 'python3', rootProject.file('scripts/fetch_models.py'), layout.buildDirectory.dir('generated/ocrAssets/tessdata').get().asFile
+}
+tasks.named('preBuild').configure { dependsOn 'prepareOcrModels' }
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    implementation 'com.github.adaptech-cz.Tesseract4Android:tesseract4android-openmp:4.9.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+}
