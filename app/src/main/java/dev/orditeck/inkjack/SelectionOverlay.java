@@ -19,9 +19,8 @@ final class SelectionOverlay {
     private FrameLayout root;
     private RegionView regionView;
     private CaptureToolbar toolbar;
-    private FrameLayout.LayoutParams toolbarParams;
+    private ToolbarMover mover;
     private boolean attached;
-    private android.graphics.Insets bars=android.graphics.Insets.NONE;
 
     SelectionOverlay(InkAccessibilityService service,java.util.List<TextRegion> regions,Bitmap screenshot,Runnable scan) {
         this.service=service;this.regions=regions;this.screenshot=screenshot;this.scan=scan;
@@ -39,28 +38,14 @@ final class SelectionOverlay {
             @Override public void collect(){collectSelection();}
             @Override public void close(){service.cancel();}
             @Override public void more(View anchor){showMore(anchor);}
+            @Override public void move(){mover.moveToOppositeEdge();}
         });
-        toolbarParams=new FrameLayout.LayoutParams(-1,-2);root.addView(toolbar,toolbarParams);
-        root.setOnApplyWindowInsetsListener((v,insets)->{
-            bars=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());positionToolbar();return insets;
-        });
-        root.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(r-l!=or-ol)positionToolbar();});
-        positionToolbar();refresh();
+        root.addView(toolbar,new FrameLayout.LayoutParams(-1,-2));
+        mover=new ToolbarMover(root,toolbar,preferences);refresh();
         var params=new WindowManager.LayoutParams(-1,-1,WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,PixelFormat.TRANSLUCENT);
         params.gravity=Gravity.TOP|Gravity.START;params.layoutInDisplayCutoutMode=WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         params.setTitle("Inkjack text selection");manager.addView(root,params);attached=true;root.requestFocus();
-    }
-    @android.annotation.SuppressLint("RtlHardcoded") // Physical cutout insets determine a centered display position in every locale.
-    private void positionToolbar() {
-        if(toolbar==null)return;
-        int pad=Ui.dp(service,12);
-        int available=root.getWidth()>0?root.getWidth()-bars.left-bars.right-2*pad:0;
-        toolbarParams.width=available>0?Math.min(available,Ui.dp(service,520)):-1;
-        toolbarParams.gravity=(settings.atTop?Gravity.TOP:Gravity.BOTTOM)|Gravity.LEFT;
-        int centerOffset=available>0?(available-toolbarParams.width)/2:0;
-        toolbarParams.setMargins(pad+bars.left+centerOffset,pad+bars.top,pad+bars.right,pad+bars.bottom);
-        toolbar.setLayoutParams(toolbarParams);
     }
     private void toggleAll(){if(selected.cardinality()==regions.size())selected.clear();else selected.set(0,regions.size());refresh();}
     private void copySelection() {
@@ -78,13 +63,11 @@ final class SelectionOverlay {
         var popup=new PopupMenu(service,anchor);var menu=popup.getMenu();
         menu.add(0,1,0,R.string.overlay_scan_help);
         var collect=menu.add(0,2,1,R.string.overlay_collect);collect.setEnabled(!selected.isEmpty());
-        menu.add(0,3,2,settings.atTop?R.string.overlay_move_bottom:R.string.overlay_move_top);
         menu.add(0,4,3,R.string.overlay_customize);
         popup.setOnMenuItemClickListener(item->{
             switch(item.getItemId()) {
                 case 1:scan.run();break;
                 case 2:collectSelection();break;
-                case 3:preferences.set(OverlayPreferences.TOP,!settings.atTop);settings=preferences.read();positionToolbar();break;
                 case 4:service.dismiss();service.startActivity(new Intent(service,OverlaySettingsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));break;
                 default:return false;
             }return true;

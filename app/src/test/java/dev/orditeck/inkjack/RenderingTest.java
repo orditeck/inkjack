@@ -30,7 +30,7 @@ public class RenderingTest {
     }
     @Test public void rendersCaptureToolbarAndPinnedCustomizationPreview() throws Exception {
         var context=org.robolectric.RuntimeEnvironment.getApplication();var prefs=new OverlayPreferences(context);prefs.reset();
-        var settings=prefs.read();var frame=new FrameLayout(context);frame.setBackgroundColor(0xFF26332E);
+        prefs.savePosition(.5f,.62f);var settings=prefs.read();var frame=new FrameLayout(context);frame.setBackgroundColor(0xFF26332E);
         frame.addView(new View(context){
             private final android.graphics.Paint paint=new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
             private final android.graphics.Rect bounds=new android.graphics.Rect();
@@ -48,7 +48,7 @@ public class RenderingTest {
         },new FrameLayout.LayoutParams(-1,-1));
         var toolbar=new CaptureToolbar(context,settings,false,new OverlayUiTest.Actions());
         toolbar.update(2,3,"Coffee tomorrow?\nMeet by the river at 10:30.");
-        var params=new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM);params.setMargins(12,12,12,24);frame.addView(toolbar,params);
+        frame.addView(toolbar,new FrameLayout.LayoutParams(-1,-2));new ToolbarMover(frame,toolbar,prefs);
         render(frame,"inkjack-toolbar.png");
         try(var activity=Robolectric.buildActivity(OverlaySettingsActivity.class).setup()) {
             render(activity.get().getWindow().getDecorView(),"inkjack-customize.png");
@@ -58,6 +58,7 @@ public class RenderingTest {
         var context=org.robolectric.RuntimeEnvironment.getApplication();var configuration=context.getResources().getConfiguration();configuration.fontScale=1.5f;
         context.getResources().updateConfiguration(configuration,context.getResources().getDisplayMetrics());
         var prefs=new OverlayPreferences(context);prefs.reset();
+        prefs.set(OverlayPreferences.OCR,true);
         var toolbar=new CaptureToolbar(context,prefs.read(),false,new OverlayUiTest.Actions());toolbar.update(1,3,"Selected words");
         toolbar.measure(View.MeasureSpec.makeMeasureSpec(296,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.AT_MOST));
         toolbar.layout(0,0,296,toolbar.getMeasuredHeight());
@@ -69,8 +70,11 @@ public class RenderingTest {
         }
     }
     private void render(View view,String name) throws Exception {
-        view.measure(View.MeasureSpec.makeMeasureSpec(411,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(891,View.MeasureSpec.EXACTLY));
-        view.layout(0,0,411,891);
+        for(int pass=0;pass<3;pass++){
+            view.forceLayout();
+            view.measure(View.MeasureSpec.makeMeasureSpec(411,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(891,View.MeasureSpec.EXACTLY));
+            view.layout(0,0,411,891);
+        }
         var bitmap=Bitmap.createBitmap(411,891,Bitmap.Config.ARGB_8888);
         view.draw(new Canvas(bitmap));
         var dir=new File("build/previews");assertTrue(dir.isDirectory()||dir.mkdirs());

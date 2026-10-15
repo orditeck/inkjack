@@ -15,11 +15,14 @@ final class CaptureToolbar extends LinearLayout {
     interface Actions {
         void copy(); void edit(); void selectAll(); void scan(); void collect(); void close();
         void more(View anchor);
+        void move();
     }
     private final TextView count,preview;
     private final Button copy,edit,selectAll,scan,collect;
     private final OverlayPreferences.Snapshot settings;
     private final boolean ocrMode;
+    private final LinearLayout dragHandle;
+    private final ImageButton move;
 
     CaptureToolbar(Context context,OverlayPreferences.Snapshot settings,boolean ocrMode,Actions actions) {
         super(context);this.settings=settings;this.ocrMode=ocrMode;
@@ -30,6 +33,14 @@ final class CaptureToolbar extends LinearLayout {
         background.setStroke(Ui.dp(context,1),0xFF354239);setBackground(background);
 
         var header=new LinearLayout(context);header.setGravity(Gravity.CENTER_VERTICAL);
+        dragHandle=new LinearLayout(context);dragHandle.setId(R.id.overlay_drag);
+        dragHandle.setGravity(Gravity.CENTER_VERTICAL);
+        dragHandle.setContentDescription(context.getString(R.string.overlay_drag_help));
+        dragHandle.setTooltipText(context.getString(R.string.overlay_drag_help));
+        dragHandle.setOnClickListener(v->Ui.toast(context,context.getString(R.string.overlay_drag_help)));
+        var grip=new ImageView(context);grip.setImageResource(R.drawable.ic_drag);grip.setImageTintList(ColorStateList.valueOf(Ui.MUTED));
+        grip.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        dragHandle.addView(grip,new LayoutParams(Ui.dp(context,16),Ui.dp(context,24)));
         var headings=Ui.column(context);
         var title=Ui.text(context,context.getString(R.string.overlay_title),17,Ui.WHITE);
         title.setSingleLine(true);title.setEllipsize(TextUtils.TruncateAt.END);
@@ -37,7 +48,10 @@ final class CaptureToolbar extends LinearLayout {
         headings.addView(title);
         count=Ui.text(context,"",11,Ui.MUTED);count.setPadding(Ui.dp(context,4),Ui.dp(context,2),0,0);
         count.setSingleLine(true);count.setEllipsize(TextUtils.TruncateAt.END);
-        headings.addView(count);header.addView(headings,new LayoutParams(0,-2,1));
+        headings.addView(count);dragHandle.addView(headings,new LayoutParams(0,-2,1));
+        header.addView(dragHandle,new LayoutParams(0,-1,1));
+        move=icon(R.drawable.ic_arrow_up,R.string.overlay_move_top,v->actions.move());move.setId(R.id.overlay_move);
+        header.addView(move);setMoveTarget(!settings.atTop);
         header.addView(icon(R.drawable.ic_more,R.string.overlay_more,v->actions.more(v)));
         header.addView(icon(R.drawable.ic_close,R.string.overlay_close,v->actions.close()));
         addView(header,new LayoutParams(-1,Ui.dp(context,Math.max(48,getResources().getConfiguration().fontScale*34+10))));
@@ -57,12 +71,21 @@ final class CaptureToolbar extends LinearLayout {
         scan=button(R.string.overlay_scan,false,true,v->actions.scan());scan.setId(R.id.overlay_scan);
         collect=button(R.string.overlay_collect,false,true,v->actions.collect());collect.setId(R.id.overlay_collect);
         selectAll.setTooltipText(context.getString(R.string.overlay_select_help));
-        scan.setTooltipText(context.getString(R.string.overlay_scan_help));scan.setContentDescription(context.getString(R.string.overlay_scan_help));
+        scan.setTooltipText(context.getString(R.string.overlay_scan_explanation));
+        scan.setContentDescription(context.getString(R.string.overlay_scan)+". "+context.getString(R.string.overlay_scan_explanation));
         collect.setTooltipText(context.getString(R.string.overlay_collect_help));
         shortcuts.addView(selectAll,weighted(0,0));
         if(settings.ocr)shortcuts.addView(scan,weighted(0,0));
         if(settings.collect)shortcuts.addView(collect,weighted(0,0));
         addView(shortcuts);update(0,0,"");
+    }
+    @android.annotation.SuppressLint("ClickableViewAccessibility") // ToolbarMover invokes the standard performClick for taps; the arrow provides accessible movement.
+    void setDragListener(OnTouchListener listener){dragHandle.setOnTouchListener(listener);}
+    void setMoveTarget(boolean toTop) {
+        var image=getContext().getDrawable(toTop?R.drawable.ic_arrow_up:R.drawable.ic_arrow_down).mutate();image.setTint(Ui.MUTED);
+        move.setImageDrawable(image);
+        String label=getContext().getString(toTop?R.string.overlay_move_top:R.string.overlay_move_bottom);
+        move.setContentDescription(label);move.setTooltipText(label);
     }
     private LayoutParams weighted(int left,int right) {
         var p=new LayoutParams(0,actionHeight(),1);
@@ -90,7 +113,8 @@ final class CaptureToolbar extends LinearLayout {
         b.setStateListAnimator(null);b.setOnClickListener(action);return b;
     }
     void update(int selected,int total,String text) {
-        count.setText(getContext().getString(ocrMode?R.string.overlay_count_ocr:R.string.overlay_count_screen,selected,total));
+        count.setText(getContext().getString(R.string.overlay_count,selected,total));
+        count.setContentDescription(getContext().getString(ocrMode?R.string.overlay_count_ocr:R.string.overlay_count_screen,selected,total));
         preview.setText(total==0?getContext().getString(R.string.overlay_empty):selected==0?getContext().getString(R.string.overlay_hint):text.replace('\n',' '));
         preview.setTextColor(selected==0?Ui.MUTED:Ui.WHITE);
         copy.setEnabled(selected>0);copy.setAlpha(selected>0?1f:.38f);

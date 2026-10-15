@@ -17,14 +17,14 @@ Native Android. Offline Tesseract OCR. No ads, accounts, analytics, or internet 
 | Feature | How it works |
 | --- | --- |
 | Screen text | Reads visible accessibility text on demand. Tap outlined regions to select them. |
-| Screen OCR | Tap **Scan screen** in the overlay to recognize text that apps don't expose. |
+| Screen OCR | Runs automatically when an app exposes no text. **Rescan with OCR** in the menu handles partially missing text. |
 | Image and PDF import | Open a file or share it to Inkjack. PDFs support up to 20 pages per import. |
 | Precise selection | Long-press a box to edit it, or use **Edit text** and Android's text selection handles. |
 | Multi-screen collection | Collect selections, scroll or switch apps, capture again, then combine your collection. |
 | Entity extraction | Pull out emails, URLs, phone numbers, @handles, and #hashtags. |
 | Copy and share | Copy all text or just the selected substring. Share through Android's chooser. |
 | Fast activation | Quick Settings tile, optional notification, and Android's accessibility button. |
-| Customizable capture toolbar | Choose position, spacing, highlight color, dimming, visible shortcuts, and whether copying closes the overlay. Settings include a pinned live preview. |
+| Customizable capture toolbar | Drag freely or jump to an edge. Choose width, spacing, highlight color, dimming, visible shortcuts, and whether copying closes the overlay. Settings include a pinned live preview. |
 | Offline languages | English and French models bundled in the APK, with a language picker. |
 
 Requires **Android 11 or newer** (API 30). Tablets and foldables use the same responsive native layouts.
@@ -37,7 +37,7 @@ This is an early independent implementation inspired by Universal Copy's public 
 2. Open Inkjack, read the disclosure, and enable it under Android **Settings → Accessibility → Inkjack**.
 3. Add the **Lift text** Quick Settings tile. On Android 13+, the app can request this for you.
 4. Open another app, activate **Lift text**, and tap the outlined text.
-5. Choose **Copy text**, **Collect text**, or **Edit text**. If the app exposes no useful text, choose **Scan screen**.
+5. Choose **Copy text**, **Collect text**, or **Edit text**. If the app exposes no useful text, choose **⋮ → Rescan with OCR**.
 
 For images and PDFs, **Scan an image or PDF** works without enabling accessibility. You can also use another app's Share menu.
 
@@ -68,7 +68,10 @@ Open **Customize capture toolbar** on the home screen, or use **⋮ → Customiz
 - **Copy text** copies only your selected blocks. It is disabled when nothing is selected.
 - **Edit all text** opens all detected text when nothing is selected. After selecting blocks, it becomes **Edit text** and opens only that selection.
 - **Collect text** combines selections across screens. Hidden shortcuts remain available in the **⋮** menu.
-- **Move toolbar to top/bottom** in the menu reveals text covered by the toolbar during the current capture.
+- **Drag the header** to move the toolbar anywhere it fits on the visible screen. The app remembers its relative position across captures and adapts it to the screen size.
+- **Up/down arrow** jumps to the opposite edge without opening the menu.
+- **Floating/Wide** width controls how much horizontal room you have to drag.
+- **Rescan with OCR** takes a screenshot and recognizes its text locally. It lives in the menu by default; an optional shortcut can be enabled in settings. OCR runs automatically when the initial app-text lookup finds nothing, except when visible password fields were excluded or traversal reached its limit.
 
 ## Privacy and permissions
 

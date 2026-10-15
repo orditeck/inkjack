@@ -39,12 +39,14 @@ public final class OverlaySettingsActivity extends Activity {
 
         var layout=Ui.card(this,body);layout.addView(Ui.label(this,"LAYOUT"));
         var current=preferences.read();
-        choice(layout,"Position",new String[]{"Bottom","Top"},current.atTop?1:0,n->{preferences.set(OverlayPreferences.TOP,n==1);updatePreview();});
+        layout.addView(Ui.text(this,getString(R.string.overlay_position_help),13,Ui.MUTED));
+        choice(layout,"Dock position",new String[]{"Bottom","Top"},current.freePosition?-1:current.atTop?1:0,n->{preferences.dock(n==1);updatePreview();});
+        choice(layout,"Width",new String[]{"Floating (more room to move)","Wide"},current.wide?1:0,n->{preferences.set(OverlayPreferences.WIDE,n==1);updatePreview();});
         choice(layout,"Spacing",new String[]{"Compact","Comfortable"},current.compact?0:1,n->{preferences.set(OverlayPreferences.COMPACT,n==0);updatePreview();});
         toggle(layout,"Selection preview","Show a snippet of the selected text",current.preview,R.id.overlay_toggle_preview,OverlayPreferences.PREVIEW);
 
         var actions=Ui.card(this,body);actions.addView(Ui.label(this,"SHORTCUTS & BEHAVIOR"));
-        toggle(actions,"Scan screen","Show the OCR shortcut for text inside images",current.ocr,R.id.overlay_toggle_ocr,OverlayPreferences.OCR);
+        toggle(actions,getString(R.string.overlay_scan),getString(R.string.overlay_scan_explanation)+" Always available in the menu.",current.ocr,R.id.overlay_toggle_ocr,OverlayPreferences.OCR);
         toggle(actions,"Collect text","Combine selections from several screens",current.collect,R.id.overlay_toggle_collect,OverlayPreferences.COLLECT);
         toggle(actions,"Close after copying","Turn off to copy several selections in one capture",current.closeOnCopy,R.id.overlay_toggle_close,OverlayPreferences.CLOSE_ON_COPY);
         actions.addView(Ui.text(this,"Hidden shortcuts are still available in the toolbar's ⋮ menu.",12,Ui.MUTED));
@@ -90,14 +92,16 @@ public final class OverlaySettingsActivity extends Activity {
             @Override public void selectAll(){sample();}@Override public void scan(){sample();}
             @Override public void collect(){sample();}@Override public void close(){sample();}
             @Override public void more(View anchor){sample();}
+            @Override public void move(){sample();}
         });
         toolbar.update(2,8,getString(R.string.overlay_preview_sample));
         boolean showScene=getResources().getConfiguration().screenHeightDp>=700;
         var scene=new HighlightPreview(this,settings);
         if(showScene&&!settings.atTop)previewHost.addView(scene,new LinearLayout.LayoutParams(-1,Ui.dp(this,104)));
-        previewHost.addView(toolbar);
+        var toolbarSize=new LinearLayout.LayoutParams(Math.min(getResources().getDisplayMetrics().widthPixels-Ui.dp(this,32),Ui.dp(this,settings.wide?520:340)),-2);
+        toolbarSize.gravity=android.view.Gravity.CENTER_HORIZONTAL;previewHost.addView(toolbar,toolbarSize);
         if(showScene&&settings.atTop)previewHost.addView(scene,new LinearLayout.LayoutParams(-1,Ui.dp(this,104)));
-        if(position!=null)position.setText(getString(R.string.overlay_preview_position,settings.atTop?"top":"bottom"));
+        if(position!=null)position.setText(settings.freePosition?getString(R.string.overlay_free_position):getString(R.string.overlay_preview_position,settings.atTop?"top":"bottom"));
     }
     private static final class HighlightPreview extends View {
         private final OverlayPreferences.Snapshot settings;

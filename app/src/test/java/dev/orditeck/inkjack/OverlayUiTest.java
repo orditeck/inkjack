@@ -29,13 +29,13 @@ public class OverlayUiTest {
         toolbar.update(4,4,"Everything");
         assertEquals("Clear selection",toolbar.<Button>findViewById(R.id.overlay_select_all).getText().toString());
     }
-    @Test public void noDetectedTextLeavesOcrAvailableAndDoesNotOfferEmptyEditor() {
+    @Test public void emptyCaptureShowsRecoveryAndDoesNotOfferEmptyActions() {
         var context=RuntimeEnvironment.getApplication();var toolbar=new CaptureToolbar(context,new OverlayPreferences(context).read(),true,new Actions());
         toolbar.update(0,0,"");
         assertFalse(toolbar.findViewById(R.id.overlay_copy).isEnabled());
         assertFalse(toolbar.findViewById(R.id.overlay_edit).isEnabled());
-        assertTrue(toolbar.findViewById(R.id.overlay_scan).isEnabled());
-        assertTrue(contains(toolbar,"No text found. Try Scan screen for text inside images."));
+        assertNull(toolbar.findViewById(R.id.overlay_scan));
+        assertTrue(contains(toolbar,"No text found. Try another screen or change the OCR language in Inkjack."));
     }
     @Test public void hiddenShortcutAndPreviewPersistThroughSettingsRecreation() {
         try(var activity=Robolectric.buildActivity(OverlaySettingsActivity.class).setup()) {
@@ -64,6 +64,6 @@ public class OverlayUiTest {
         int edits,copies;
         @Override public void copy(){copies++;}@Override public void edit(){edits++;}
         @Override public void selectAll(){}@Override public void scan(){}@Override public void collect(){}
-        @Override public void close(){}@Override public void more(View anchor){}
+        @Override public void close(){}@Override public void more(View anchor){}@Override public void move(){}
     }
 }

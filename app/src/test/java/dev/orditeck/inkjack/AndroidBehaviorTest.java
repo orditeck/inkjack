@@ -47,6 +47,17 @@ public class AndroidBehaviorTest {
         var regions=NodeReader.read(node,new Rect(0,0,200,200));
         assertEquals(1,regions.size());assertEquals("Québec",regions.get(0).text);assertEquals(new Rect(0,5,200,50),regions.get(0).bounds);
     }
+    @Test public void emptyScreenRequestsOcrButPasswordFieldsDoNotTriggerScreenshotFallback() {
+        assertTrue(NodeReader.readScreen(null,new Rect(0,0,200,200)).needsOcr());
+        var empty=AccessibilityNodeInfo.obtain();empty.setVisibleToUser(true);empty.setBoundsInScreen(new Rect(0,0,200,200));
+        assertTrue(NodeReader.readScreen(empty,new Rect(0,0,200,200)).needsOcr());
+        var password=AccessibilityNodeInfo.obtain();password.setVisibleToUser(true);password.setPassword(true);
+        password.setText("secret");password.setBoundsInScreen(new Rect(0,0,200,50));
+        var excluded=NodeReader.readScreen(password,new Rect(0,0,200,200));
+        assertTrue(excluded.regions.isEmpty());assertFalse(excluded.needsOcr());
+        var text=AccessibilityNodeInfo.obtain();text.setVisibleToUser(true);text.setText("Words");text.setBoundsInScreen(new Rect(0,0,200,50));
+        assertFalse(NodeReader.readScreen(text,new Rect(0,0,200,200)).needsOcr());
+    }
     private static boolean findText(View view,String text) {
         if(view instanceof TextView t && t.getText().toString().equals(text))return true;
         if(view instanceof ViewGroup g)for(int i=0;i<g.getChildCount();i++)if(findText(g.getChildAt(i),text))return true;

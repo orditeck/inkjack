@@ -56,8 +56,8 @@ public final class InkAccessibilityService extends AccessibilityService {
         var root=getRootInActiveWindow();
         if(root!=null && getPackageName().equals(String.valueOf(root.getPackageName()))) {root.recycle();Ui.toast(this,"Open another app first, then tap Lift text.");return;}
         var metrics=getSystemService(WindowManager.class).getMaximumWindowMetrics();
-        var regions=NodeReader.read(root,metrics.getBounds());
-        show(regions,null);
+        var text=NodeReader.readScreen(root,metrics.getBounds());
+        if(text.needsOcr())screenshot();else show(text.regions,null);
     }
     private void screenshot() {
         busy=true; int token=++generation;

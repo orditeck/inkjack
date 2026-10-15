@@ -6,8 +6,17 @@ import java.util.*;
 
 final class NodeReader {
     static List<TextRegion> read(AccessibilityNodeInfo root, Rect screen) {
-        var result = new ArrayList<TextRegion>();
-        if (root == null) return result;
+        return readScreen(root,screen).regions;
+    }
+    static final class ScreenText {
+        final List<TextRegion> regions=new ArrayList<>();
+        boolean passwordPresent,truncated;
+        boolean needsOcr(){return regions.isEmpty()&&!passwordPresent&&!truncated;}
+    }
+    static ScreenText readScreen(AccessibilityNodeInfo root, Rect screen) {
+        var capture=new ScreenText();
+        var result=capture.regions;
+        if (root == null) return capture;
         var queue = new ArrayDeque<AccessibilityNodeInfo>();
         var visited = new HashSet<AccessibilityNodeInfo>();
         var duplicates = new HashSet<String>();
@@ -16,7 +25,8 @@ final class NodeReader {
             while (!queue.isEmpty() && visited.size() < 10_000) {
                 var node = queue.remove();
                 if (!visited.add(node)) { node.recycle(); continue; }
-                if (!node.isVisibleToUser() || node.isPassword()) continue;
+                if (!node.isVisibleToUser()) continue;
+                if (node.isPassword()) {capture.passwordPresent=true;continue;}
                 var bounds = new Rect(); node.getBoundsInScreen(bounds);
                 // A zero-sized virtual container can still have visible descendants.
                 boolean intersects = Rect.intersects(bounds, screen);
@@ -30,11 +40,12 @@ final class NodeReader {
                 }
                 for (int i=0; i<node.getChildCount(); i++) { var child=node.getChild(i); if(child!=null) queue.add(child); }
             }
+            capture.truncated=!queue.isEmpty();
         } finally {
             for (var node:visited) node.recycle();
             for (var node:queue) node.recycle();
         }
         result.sort(Comparator.comparingInt((TextRegion r)->r.bounds.top).thenComparingInt(r->r.bounds.left));
-        return result;
+        return capture;
     }
 }

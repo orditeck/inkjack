@@ -6,4 +6,5 @@
     <item name="overlay_toggle_preview" type="id"/><item name="overlay_toggle_ocr" type="id"/>
     <item name="overlay_toggle_collect" type="id"/><item name="overlay_toggle_close" type="id"/>
     <item name="overlay_toggle_outlines" type="id"/>
+    <item name="overlay_move" type="id"/><item name="overlay_drag" type="id"/>
 </resources>
